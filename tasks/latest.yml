@@ -1,0 +1,28 @@
+---
+- name: Check the latest version of geoipupdate
+  block:
+
+    - name: Check the latest version of geoipupdate
+      uri:
+        url: https://github.com/maxmind/geoipupdate/releases/latest
+        method: HEAD
+        status_code: 302
+        follow_redirects: none
+      check_mode: false
+      register: geoipupdate_latest_headers
+
+    - name: Set a fact for the latest version of geoipupdate
+      set_fact:
+        geoipupdate_latest: "{{ geoipupdate_latest_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+
+    - name: Debug veriables
+      debug:
+        msg:
+          - "geoipupdate_installed: {{ geoipupdate_installed }}"
+          - "geoipupdate_latest: {{ geoipupdate_latest }}"
+        verbosity: 1
+      when: geoipupdate_installed != geoipupdate_latest
+
+  tags:
+    - geoipupdate
+...
