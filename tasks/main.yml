@@ -7,83 +7,18 @@
     - geoipupdate
 
 - name: Check which version of geoipupdate is installed
-  block:
-
-    - name: Check which version of geoipupdate is installed
-      command: geoipupdate -V
-      register: geoipupdate_version_check
-
-    - name: Set a fact for the installed version of geoipupdate
-      set_fact:
-        geoipupdate_installed: "{{ geoipupdate_version_check.stderr.split(' ')[1] }}"
-
+  include_tasks: check.yml
   when: ( geoipupdate_check is defined ) and ( "geoipupdate" in geoipupdate_check.stdout )
   tags:
     - geoipupdate
 
 - name: Check the latest version of geoipupdate
-  block:
-
-    - name: Check the latest version of geoipupdate
-      uri:
-        url: https://github.com/maxmind/geoipupdate/releases/latest
-        method: HEAD
-        status_code: 302
-        follow_redirects: none
-      check_mode: false
-      register: geoipupdate_latest_headers
-
-    - name: Set a fact for the latest version of geoipupdate
-      set_fact:
-        geoipupdate_latest: "{{ geoipupdate_latest_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
-
-    - name: Debug veriables
-      debug:
-        msg:
-          - "geoipupdate_installed: {{ geoipupdate_installed }}"
-          - "geoipupdate_latest: {{ geoipupdate_latest }}" 
-        verbosity: 1
-      when: geoipupdate_installed != geoipupdate_latest
-
+  include_tasks: latest.yml
   tags:
     - geoipupdate
 
 - name: Download and install latest version of geoipupdate
-  block:
-
-    - name: Download checksums
-      get_url:
-        url: "https://github.com/maxmind/geoipupdate/releases/download/v{{ geoipupdate_latest }}/checksums-dpkg-rpm.txt"
-        dest: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_checksums-dpkg-rpm.txt"
-
-    - name: Slurp checksums
-      slurp:
-        src: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_checksums-dpkg-rpm.txt"
-      register: geoipupdate_checksums_b64encoded
-
-    - name: Set an array for the lines of the checksum file
-      set_fact:
-        geoipupdate_checksums: "{{ ( geoipupdate_checksums_b64encoded['content'] | b64decode | trim ).split('\n') }}"
-
-    - name: Set a fact for the checksum for the deb
-      set_fact:
-        geoipupdate_checksum: "{{ line.split(' ')[0] }}"
-      when: ( "linux_amd64.deb" in line )
-      loop: "{{ geoipupdate_checksums }}"
-      loop_control:
-        loop_var: line
-        label: "{{ line }}"
-
-    - name: Download geoipupdate
-      get_url:
-        url: "https://github.com/maxmind/geoipupdate/releases/download/v{{ geoipupdate_latest }}/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb"
-        checksum: "sha256:{{ geoipupdate_checksum }}"
-        dest: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb"
-
-    - name: Install geoipupdate
-      apt:
-        deb: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb"
-
+  include_tasks: install.yml
   when: ( geoipupdate_check.stdout == "ABSENT" ) or ( geoipupdate_installed != geoipupdate_latest )
   tags:
     - geoipupdate
