@@ -42,6 +42,7 @@
         msg:
           - "geoipupdate_installed: {{ geoipupdate_installed }}"
           - "geoipupdate_latest: {{ geoipupdate_latest }}" 
+        verbosity: 1
       when: geoipupdate_installed != geoipupdate_latest
 
   tags:
@@ -83,7 +84,7 @@
       apt:
         deb: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb"
 
-  when: ( geoipupdate_check.stat.exists is not defined ) or ( geoipupdate_installed != geoipupdate_latest )
+  when: ( geoipupdate_check.stat.exists == False ) or ( geoipupdate_installed != geoipupdate_latest )
   tags:
     - geoipupdate
 ...
