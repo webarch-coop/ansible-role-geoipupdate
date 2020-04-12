@@ -52,11 +52,15 @@
         src: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_checksums-dpkg-rpm.txt"
       register: geoipupdate_checksums_b64encoded
 
+    - name: Set an array for the lines of the checksum file
+      set_fact:
+        geoipupdate_checksums: "{{ ( geoipupdate_checksums_b64encoded['content'] | b64decode | trim ).split('\n') }}"
+
     - name: Set a fact for the checksum for the deb
       set_fact:
         geoipupdate_checksum: "{{ line.split(' ')[0] }}"
       when: ( "linux_amd64.deb" in line )
-      loop: "{{ geoipupdate_checksums_b64encoded.stdout_lines }}"
+      loop: "{{ geoipupdate_checksums }}"
       loop_control:
         loop_var: line
         label: "{{ line }}"
