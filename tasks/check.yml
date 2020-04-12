@@ -4,6 +4,8 @@
 
     - name: Check which version of geoipupdate is installed
       command: geoipupdate -V
+      check_mode: false
+      changed_when: false
       register: geoipupdate_version_check
 
     - name: Set a fact for the installed version of geoipupdate
