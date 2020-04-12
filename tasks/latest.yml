@@ -9,6 +9,7 @@
         status_code: 302
         follow_redirects: none
       check_mode: false
+      changed_when: false
       register: geoipupdate_latest_headers
 
     - name: Set a fact for the latest version of geoipupdate
