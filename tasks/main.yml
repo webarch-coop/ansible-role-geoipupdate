@@ -2,6 +2,7 @@
 - name: Check if geoipupdate is installed
   shell: which geoipupdate || echo ABSENT
   register: geoipupdate_check
+  changed_when: ( "ABSENT" in geoipupdate_check.stdout )
   tags:
     - geoipupdate
 
