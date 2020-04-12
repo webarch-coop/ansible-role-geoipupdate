@@ -32,7 +32,7 @@
       check_mode: false
       register: geoipupdate_latest_headers
 
-    - name: Set a fact for the latest version of geoipupdate 
+    - name: Set a fact for the latest version of geoipupdate
       set_fact:
         geoipupdate_latest: "{{ geoipupdate_latest_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
 
@@ -63,7 +63,7 @@
 
     - name: Download geoipupdate
       get_url:
-        url: "https://github.com/maxmind/geoipupdate/releases/download/v{{ geoipupdate_latest }}/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb" 
+        url: "https://github.com/maxmind/geoipupdate/releases/download/v{{ geoipupdate_latest }}/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb"
         checksum: "sha256:{{ geoipupdate_checksum }}"
         dest: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb"
 
