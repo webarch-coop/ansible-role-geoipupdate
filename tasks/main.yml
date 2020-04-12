@@ -15,7 +15,7 @@
 
     - name: Set a fact for the installed version of geoipupdate
       set_fact:
-        geoipupdate_installed: "{{ geoipupdate_version_check.stdout.split(' ')[1] }}"
+        geoipupdate_installed: "{{ geoipupdate_version_check.stderr.split(' ')[1] }}"
 
   when: ( geoipupdate_check is defined ) and ( "geoipupdate" in geoipupdate_check.stdout )
   tags:
