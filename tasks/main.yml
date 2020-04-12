@@ -42,7 +42,7 @@
         msg:
           - "geoipupdate_installed: {{ geoipupdate_installed }}"
           - "geoipupdate_latest: {{ geoipupdate_latest }}" 
-      when: geoipupdate_installed ne geoipupdate_latest
+      when: geoipupdate_installed != geoipupdate_latest
 
   tags:
     - geoipupdate
