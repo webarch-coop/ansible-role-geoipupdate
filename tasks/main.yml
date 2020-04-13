@@ -30,13 +30,13 @@
   tags:
     - geoipupdate
 
-- name: /var/lib/GeoIP owned by www-data
-  file:
-    dest: /var/lib/GeoIP
-    owner: www-data
-    group: www-data
-  tags:
-    - geoipupdate
+# - name: /var/lib/GeoIP owned by www-data
+#   file:
+#     dest: /var/lib/GeoIP
+#     owner: www-data
+#     group: www-data
+#   tags:
+#     - geoipupdate
 
 - name: Update GeoIP database crontab in place
   cron:
