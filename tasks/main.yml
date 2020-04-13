@@ -38,7 +38,7 @@
   tags:
     - geoipupdate
 
-- name: Update GeoIP database crontab in place 
+- name: Update GeoIP database crontab in place
   cron:
     name: "Update GeoIP database"
     minute: "01"
