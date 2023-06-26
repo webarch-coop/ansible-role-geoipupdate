@@ -25,13 +25,10 @@
       ansible.builtin.set_fact:
         geoipupdate_latest: "{{ geoipupdate_latest_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
 
-    - name: Debug veriables
+    - name: Debug geoipupdate_latest variable
       ansible.builtin.debug:
-        msg:
-          - "geoipupdate_installed: {{ geoipupdate_installed }}"
-          - "geoipupdate_latest: {{ geoipupdate_latest }}"
-        verbosity: 1
-      when: geoipupdate_installed != geoipupdate_latest
+        var: geoipupdate_latest
+        verbosity: 2
 
   tags:
     - geoipupdate
