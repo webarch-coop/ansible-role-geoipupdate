@@ -53,6 +53,7 @@
         hour: "06"
         weekday: "1"
         job: geoipupdate
+      when: ( "cron" in ansible_local.dpkg.installed )
 
   when: geoipupdate | bool
   tags:
