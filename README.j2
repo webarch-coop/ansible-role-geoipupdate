@@ -16,17 +16,18 @@ Set `geoipupdate` to `true` for the tasks in this role to be run.
 Documentation for the variables follow, this documentation has been generated
 from the [meta/argument_specs.yml](meta/argument_specs.yml).
 
-### Entrypoint: main
+{% for entrypoint in argument_specs.keys() %}
+{%- set path, options=entrypoint_options[entrypoint][0] -%}
+### Entrypoint: {{ entrypoint }}
 
-The main entry point for the geoipupdate role.
+{{ argument_specs[entrypoint].short_description }}
 
 |Option|Description|Type|Required|
 |---|---|---|---|
-| geoipupdate | Run the tasks in this role. | bool | yes |
-| geoipupdate_account_id | Account ID from MaxMind. | str | yes |
-| geoipupdate_license_key | License key from MaxMind. | str | yes |
-| geoipupdate_edition_ids | A list of MaxMind database editions. | list of 'str' | yes |
-
+{%- for name, details in options.items() %}
+| {{ name }} | {{ details.display_description }} | {{ details.display_type }} | {{ details.display_required }} |
+{%- endfor %}
+{% endfor %}
 ## Repository
 
 The primary URL of this repo is

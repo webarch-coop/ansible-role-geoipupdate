@@ -19,11 +19,11 @@ argument_specs:
       geoipupdate_account_id:
         type: str
         required: true
-        description: Account ID from MaxMind, see https://www.maxmind.com/en/my_license_key.
+        description: Account ID from MaxMind.
       geoipupdate_license_key:
         type: str
         required: true
-        description: License key from MaxMind, see https://www.maxmind.com/en/my_license_key.
+        description: License key from MaxMind.
       geoipupdate_edition_ids:
         type: list
         elements: str
