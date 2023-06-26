@@ -44,7 +44,7 @@
 
     - name: Set facts for the geoipupdate versions
       ansible.builtin.set_fact:
-        molecule_geoipupdate_root_versions: "{{ molecule_geoipupdate_v | community.general.json_query('results[].{path: molecule_geoipupdate_path, version: stdout_lines[0]}') }}"
+        molecule_geoipupdate_root_versions: "{{ molecule_geoipupdate_v | community.general.json_query('results[].{path: molecule_geoipupdate_path, version: stderr_lines[0]}') }}"
 
     - name: Debug geoipupdate versions
       ansible.builtin.debug:
