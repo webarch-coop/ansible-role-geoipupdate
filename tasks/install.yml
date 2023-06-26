@@ -1,38 +1,58 @@
+# Copyright 2020-2023 Chris Croome
+#
+# This file is part of the Webarchitects GeoIP Update Ansible role.
+#
+# The Webarchitects GeoIP Update Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects GeoIP Update Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects GeoIP Update Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Download and install latest version of geoipupdate
   block:
 
+    - name: Set a fact for the deb package file name
+      ansible.builtin.set_fact:
+        geoipupdate_deb: "geoipupdate_{{ geoipupdate_latest }}_linux_{{ ansible_local.dpkg.arch }}.deb"
+        geoipupdate_deb_regex: " geoipupdate_{{ geoipupdate_latest }}_linux_{{ ansible_local.dpkg.arch }}.deb$"
+
     - name: Download checksums
-      get_url:
-        url: "https://github.com/maxmind/geoipupdate/releases/download/v{{ geoipupdate_latest }}/checksums-dpkg-rpm.txt"
-        dest: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_checksums-dpkg-rpm.txt"
+      ansible.builtin.get_url:
+        url: "https://github.com/maxmind/geoipupdate/releases/download/v{{ geoipupdate_latest }}/geoipupdate_{{ geoipupdate_latest }}_checksums.txt"
+        dest: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_checksums.txt"
+        mode: "0644"
+      check_mode: false
+      changed_when: false
 
     - name: Slurp checksums
-      slurp:
-        src: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_checksums-dpkg-rpm.txt"
+      ansible.builtin.slurp:
+        src: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_checksums.txt"
       register: geoipupdate_checksums_b64encoded
 
     - name: Set an array for the lines of the checksum file
-      set_fact:
+      ansible.builtin.set_fact:
         geoipupdate_checksums: "{{ ( geoipupdate_checksums_b64encoded['content'] | b64decode | trim ).split('\n') }}"
 
     - name: Set a fact for the checksum for the deb
-      set_fact:
-        geoipupdate_checksum: "{{ line.split(' ')[0] }}"
-      when: ( "linux_amd64.deb" in line )
-      loop: "{{ geoipupdate_checksums }}"
-      loop_control:
-        loop_var: line
-        label: "{{ line }}"
+      ansible.builtin.set_fact:
+        geoipupdate_checksum: "{{ (geoipupdate_checksums | select('regex', geoipupdate_deb_regex))[0].split(' ')[0] }}"
+
+    - name: Debug checksum
+      ansible.builtin.debug:
+        var: geoipupdate_checksum
+        verbosity: 2
 
     - name: Download geoipupdate
-      get_url:
+      ansible.builtin.get_url:
         url: "https://github.com/maxmind/geoipupdate/releases/download/v{{ geoipupdate_latest }}/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb"
         checksum: "sha256:{{ geoipupdate_checksum }}"
         dest: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb"
+        mode: "0644"
+      check_mode: false
+      changed_when: false
 
     - name: Install geoipupdate
-      apt:
+      ansible.builtin.apt:
         deb: "/usr/local/src/geoipupdate_{{ geoipupdate_latest }}_linux_amd64.deb"
 
   tags:

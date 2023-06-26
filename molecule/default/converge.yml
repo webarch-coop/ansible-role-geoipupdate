@@ -8,13 +8,21 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects GeoIP Update Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-modmaxminddb: false
-# Replace YOUR_ACCOUNT_ID_HERE and YOUR_LICENSE_KEY_HERE with an active account
-# ID and license key combination associated with your MaxMind account. These
-# are available from https://www.maxmind.com/en/my_license_key.
-modmaxminddb_account_id: "YOUR_ACCOUNT_ID_HERE"
-modmaxminddb_license_key: "YOUR_LICENSE_KEY_HERE"
-modmaxminddb_edition_ids:
-  - GeoLite2-Country
-  - GeoLite2-City
+- name: Run as root
+  become: true
+  connection: local
+  gather_facts: true
+  hosts:
+    - localhost
+  tasks:
+
+    - name: Debug ansible_effective_user_id
+      ansible.builtin.debug:
+        var: ansible_effective_user_id
+
+    - name: Include geoipupdate role as root
+      ansible.builtin.include_role:
+        name: geoipupdate
+      vars:  # noqa var-naming[no-role-prefix]
+        geoipupdate: true
 ...

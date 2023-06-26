@@ -1,42 +1,59 @@
+# Copyright 2020-2023 Chris Croome
+#
+# This file is part of the Webarchitects GeoIP Update Ansible role.
+#
+# The Webarchitects GeoIP Update Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects GeoIP Update Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects GeoIP Update Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Check if geoipupdate is installed
-  shell: which geoipupdate || echo ABSENT
-  register: geoipupdate_check
-  changed_when: ( "ABSENT" in geoipupdate_check.stdout )
+- name: Skip the tasks in this role as geoipupdate is false
+  ansible.builtin.debug:
+    msg: "The geoipupdate variable need to be true for the tasks in this role to run."
+  when: not geoipupdate | bool
   tags:
     - geoipupdate
 
-- name: Check which version of geoipupdate is installed
-  include_tasks: check.yml
-  when: ( geoipupdate_check is defined ) and ( "geoipupdate" in geoipupdate_check.stdout )
-  tags:
-    - geoipupdate
+- name: Install or upgrade GeoIP Update
+  block:
 
-- name: Check the latest version of geoipupdate
-  include_tasks: latest.yml
-  tags:
-    - geoipupdate
+    - name: Include apt role local fact tasks if variables are not defined
+      ansible.builtin.include_role:
+        name: apt
+        tasks_from: local_facts.yml
+      when: >-
+        ( ansible_local.dpkg.arch is not defined ) or
+        ( ansible_local.dpkg.installed is not defined )
 
-- name: Download and install latest version of geoipupdate
-  include_tasks: install.yml
-  when: ( geoipupdate_check.stdout == "ABSENT" ) or ( geoipupdate_installed != geoipupdate_latest )
-  tags:
-    - geoipupdate
+    - name: Check which version of geoipupdate is installed
+      ansible.builtin.include_tasks: check.yml
+      when: ( "geoipupdate" in ansible_local.dpkg.installed )
 
-- name: /etc/GeoIP.conf config file in place
-  template:
-    src: GeoIP.conf.j2
-    dest: /etc/GeoIP.conf
-  tags:
-    - geoipupdate
+    - name: Check the latest version of geoipupdate
+      ansible.builtin.include_tasks: latest.yml
 
-- name: Update GeoIP database crontab in place
-  cron:
-    name: "Update GeoIP database"
-    minute: "01"
-    hour: "06"
-    weekday: "1"
-    job: geoipupdate
+    - name: Download and install latest version of geoipupdate
+      ansible.builtin.include_tasks: install.yml
+      when: >-
+        ( "geoipupdate" not in ansible_local.dpkg.installed ) or
+        ( geoipupdate_installed != geoipupdate_latest )
+
+    - name: /etc/GeoIP.conf config file in place
+      ansible.builtin.template:
+        src: GeoIP.conf.j2
+        dest: /etc/GeoIP.conf
+        mode: "0644"
+
+    - name: Update GeoIP database crontab in place
+      ansible.builtin.cron:
+        name: "Update GeoIP database"
+        minute: "01"
+        hour: "06"
+        weekday: "1"
+        job: geoipupdate
+
+  when: geoipupdate | bool
   tags:
     - geoipupdate
 ...
