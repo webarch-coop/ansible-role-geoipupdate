@@ -8,13 +8,24 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects GeoIP Update Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-geoipupdate: false
-# Replace YOUR_ACCOUNT_ID_HERE and YOUR_LICENSE_KEY_HERE with an active account
-# ID and license key combination associated with your MaxMind account. These
-# are available from https://www.maxmind.com/en/my_license_key.
-geoipupdate_account_id: "YOUR_ACCOUNT_ID_HERE"
-geoipupdate_license_key: "YOUR_LICENSE_KEY_HERE"
-geoipupdate_edition_ids:
-  - GeoLite2-Country
-  - GeoLite2-City
-...
+argument_specs:
+  main:
+    short_description: The main entry point for the geoipupdate role.
+    options:
+      geoipupdate:
+        type: bool
+        required: true
+        description: Run the tasks in this role.
+      geoipupdate_account_id:
+        type: str
+        required: true
+        description: Account ID from MaxMind, see https://www.maxmind.com/en/my_license_key.
+      geoipupdate_license_key:
+        type: str
+        required: true
+        description: License key from MaxMind, see https://www.maxmind.com/en/my_license_key.
+      geoipupdate_edition_ids:
+        type: list
+        elements: str
+        required: true
+        description: A list of MaxMind database editions.
