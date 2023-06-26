@@ -37,7 +37,8 @@
       ansible.builtin.include_tasks: install.yml
       when: >-
         ( "geoipupdate" not in ansible_local.dpkg.installed ) or
-        ( geoipupdate_installed != geoipupdate_latest )
+        ( ( geoipupdate_installed is defined ) and
+        ( geoipupdate_installed != geoipupdate_latest ) )
 
     - name: /etc/GeoIP.conf config file in place
       ansible.builtin.template:
