@@ -33,8 +33,22 @@
       ansible.builtin.set_fact:
         molecule_geoipupdate_installed: "{{ molecule_geoipupdate_version_check.stderr.split(' ')[1] }}"
 
+    - name: Check the latest version of geoipupdate
+      ansible.builtin.uri:
+        url: https://github.com/maxmind/geoipupdate/releases/latest
+        method: HEAD
+        status_code: 302
+        follow_redirects: none
+      check_mode: false
+      changed_when: false
+      register: molecule_geoipupdate_latest_headers
+
+    - name: Set a fact for the latest version of geoipupdate
+      ansible.builtin.set_fact:
+        molecule_geoipupdate_latest: "{{ molecule_geoipupdate_latest_headers.location | urlsplit('path') | basename | regex_replace('^v') }}"
+
     - name: The installed version matches the latest version
       ansible.builtin.assert:
         that:
-          - molecule_geoipupdate_installed == geoipupdate_latest
+          - molecule_geoipupdate_installed == molecule_geoipupdate_latest
 ...
