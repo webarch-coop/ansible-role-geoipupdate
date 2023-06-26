@@ -8,7 +8,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects GeoIP Update Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: apt
+- name: chriscroome.apt
   src: https://git.coop/webarch/apt.git
   version: 2.2.3  # apt
   scm: git
