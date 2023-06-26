@@ -16,37 +16,25 @@
     - localhost
   tasks:
 
-    - name: Run which geoipupdate
-      ansible.builtin.command: which geoipupdate
+    - name: Check that /usr/bin/geoipupdate is present
+      ansible.builtin.stat:
+        path: /usr/bin/geoipupdate
+      register: molecule_geoipupdate_bin
+      failed_when: not molecule_geoipupdate_bin.stat.exists | bool
+
+    - name: Check the version of geoipupdate
+      ansible.builtin.command: /usr/bin/geoipupdate --version
       check_mode: false
       changed_when: false
-      register: molecule_root_which_geoipupdate
+      register: molecule_geoipupdate_version_check
+      when: molecule_geoipupdate_bin.stat.exists | bool
 
-    - name: Debug which geoipupdate
-      ansible.builtin.debug:
-        var: molecule_root_which_geoipupdate.stdout
-
-    - name: Run which geoipupdate -a
-      ansible.builtin.command: which geoipupdate -a
-      check_mode: false
-      changed_when: false
-      register: molecule_root_which_geoipupdate_a
-      failed_when: molecule_root_which_geoipupdate_a.rc is not regex('^0|1$')
-
-    - name: Check geoipupdate versions
-      ansible.builtin.command: "{{ molecule_geoipupdate_path }} --version"
-      check_mode: false
-      changed_when: false
-      register: molecule_geoipupdate_v
-      loop: "{{ molecule_root_which_geoipupdate_a.stdout_lines }}"
-      loop_control:
-        loop_var: molecule_geoipupdate_path
-
-    - name: Set facts for the geoipupdate versions
+    - name: Set a fact for the installed version of geoipupdate
       ansible.builtin.set_fact:
-        molecule_geoipupdate_root_versions: "{{ molecule_geoipupdate_v | community.general.json_query('results[].{path: molecule_geoipupdate_path, version: stderr_lines[0]}') }}"
+        molecule_geoipupdate_installed: "{{ molecule_geoipupdate_version_check.stderr.split(' ')[1] }}"
 
-    - name: Debug geoipupdate versions
-      ansible.builtin.debug:
-        var: molecule_geoipupdate_root_versions
+    - name: The installed version matches the latest version
+      ansible.builtin.assert:
+        that:
+          - molecule_geoipupdate_installed == geoipupdate_latest
 ...
