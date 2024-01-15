@@ -16,7 +16,7 @@ Documentation for the [defaults/main.yml](defaults/main.yml) variables follow, t
 
 The main entry point for the geoipupdate role.
 
-| Option | Description | Type | Required |
+|Option|Description|Type|Required|
 |---|---|---|---|
 | geoipupdate | Run the tasks in this role. | bool | yes |
 | geoipupdate_account_id | Account ID from MaxMind. | str | yes |
