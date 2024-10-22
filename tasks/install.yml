@@ -13,8 +13,8 @@
 
     - name: Set a fact for the deb package file name
       ansible.builtin.set_fact:
-        geoipupdate_deb: "geoipupdate_{{ geoipupdate_latest }}_linux_{{ ansible_local.dpkg.arch }}.deb"
-        geoipupdate_deb_regex: " geoipupdate_{{ geoipupdate_latest }}_linux_{{ ansible_local.dpkg.arch }}.deb$"
+        geoipupdate_deb: "geoipupdate_{{ geoipupdate_latest }}_linux_{{ ansible_facts.ansible_local.dpkg.arch }}.deb"
+        geoipupdate_deb_regex: " geoipupdate_{{ geoipupdate_latest }}_linux_{{ ansible_facts.ansible_local.dpkg.arch }}.deb$"
 
     - name: Download checksums
       ansible.builtin.get_url:

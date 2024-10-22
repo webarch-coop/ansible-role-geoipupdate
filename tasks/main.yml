@@ -23,12 +23,12 @@
         name: apt
         tasks_from: local_facts.yml
       when: >-
-        ( ansible_local.dpkg.arch is not defined ) or
-        ( ansible_local.dpkg.installed is not defined )
+        ( ansible_facts.ansible_local.dpkg.arch is not defined ) or
+        ( ansible_facts.ansible_local.dpkg.installed is not defined )
 
     - name: Check which version of geoipupdate is installed
       ansible.builtin.include_tasks: check.yml
-      when: ( "geoipupdate" in ansible_local.dpkg.installed )
+      when: ( "geoipupdate" in ansible_facts.ansible_local.dpkg.installed )
 
     - name: Check the latest version of geoipupdate
       ansible.builtin.include_tasks: latest.yml
@@ -36,7 +36,7 @@
     - name: Download and install latest version of geoipupdate
       ansible.builtin.include_tasks: install.yml
       when: >-
-        ( "geoipupdate" not in ansible_local.dpkg.installed ) or
+        ( "geoipupdate" not in ansible_facts.ansible_local.dpkg.installed ) or
         ( ( geoipupdate_installed is defined ) and
         ( geoipupdate_installed != geoipupdate_latest ) )
 
@@ -53,7 +53,7 @@
         hour: "06"
         weekday: "1"
         job: geoipupdate
-      when: ( "cron" in ansible_local.dpkg.installed )
+      when: ( "cron" in ansible_facts.ansible_local.dpkg.installed )
 
   when: geoipupdate | bool
   tags:
